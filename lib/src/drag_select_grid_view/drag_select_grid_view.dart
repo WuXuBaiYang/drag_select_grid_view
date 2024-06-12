@@ -261,6 +261,7 @@ class DragSelectGridViewState extends State<DragSelectGridView>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    if (!widget.enable) return _buildGridView();
     return GestureDetector(
       onTapUp: _handleTapUp,
       onLongPressStart: _handleLongPressStart,
@@ -268,42 +269,47 @@ class DragSelectGridViewState extends State<DragSelectGridView>
       onLongPressEnd: _handleLongPressEnd,
       behavior: HitTestBehavior.translucent,
       child: IgnorePointer(
-        ignoring: widget.enable && isDragging,
-        child: GridView.builder(
-          controller: widget.scrollController,
-          reverse: widget.reverse,
-          primary: widget.primary,
-          physics: widget.physics,
-          shrinkWrap: widget.shrinkWrap,
-          padding: widget.padding,
-          gridDelegate: widget.gridDelegate,
-          itemCount: widget.itemCount,
-          addAutomaticKeepAlives: widget.addAutomaticKeepAlives,
-          addRepaintBoundaries: widget.addRepaintBoundaries,
-          addSemanticIndexes: widget.addSemanticIndexes,
-          cacheExtent: widget.cacheExtent,
-          semanticChildCount: widget.semanticChildCount,
-          dragStartBehavior: widget.dragStartBehavior,
-          keyboardDismissBehavior: widget.keyboardDismissBehavior,
-          restorationId: widget.restorationId,
-          clipBehavior: widget.clipBehavior,
-          itemBuilder: (context, index) {
-            return IgnorePointer(
-              ignoring: isSelecting || widget.triggerSelectionOnTap,
-              child: Selectable(
-                index: index,
-                onMountElement: _elements.add,
-                onUnmountElement: _elements.remove,
-                child: widget.itemBuilder(
-                  context,
-                  index,
-                  selectedIndexes.contains(index),
-                ),
-              ),
-            );
-          },
-        ),
+        ignoring: isDragging,
+        child: _buildGridView(),
       ),
+    );
+  }
+
+  Widget _buildGridView() {
+    return GridView.builder(
+      controller: widget.scrollController,
+      reverse: widget.reverse,
+      primary: widget.primary,
+      physics: widget.physics,
+      shrinkWrap: widget.shrinkWrap,
+      padding: widget.padding,
+      gridDelegate: widget.gridDelegate,
+      itemCount: widget.itemCount,
+      addAutomaticKeepAlives: widget.addAutomaticKeepAlives,
+      addRepaintBoundaries: widget.addRepaintBoundaries,
+      addSemanticIndexes: widget.addSemanticIndexes,
+      cacheExtent: widget.cacheExtent,
+      semanticChildCount: widget.semanticChildCount,
+      dragStartBehavior: widget.dragStartBehavior,
+      keyboardDismissBehavior: widget.keyboardDismissBehavior,
+      restorationId: widget.restorationId,
+      clipBehavior: widget.clipBehavior,
+      itemBuilder: (context, index) {
+        if (!widget.enable) return widget.itemBuilder(context, index, false);
+        return IgnorePointer(
+          ignoring: isSelecting || widget.triggerSelectionOnTap,
+          child: Selectable(
+            index: index,
+            onMountElement: _elements.add,
+            onUnmountElement: _elements.remove,
+            child: widget.itemBuilder(
+              context,
+              index,
+              selectedIndexes.contains(index),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -319,7 +325,6 @@ class DragSelectGridViewState extends State<DragSelectGridView>
   }
 
   void _handleTapUp(TapUpDetails details) {
-    if (!widget.enable) return;
     if (isSelecting || widget.triggerSelectionOnTap) {
       final tapIndex = _findIndexOfSelectable(details.localPosition);
 
@@ -332,7 +337,6 @@ class DragSelectGridViewState extends State<DragSelectGridView>
   }
 
   void _handleLongPressStart(LongPressStartDetails details) {
-    if (!widget.enable) return;
     final pressIndex = _findIndexOfSelectable(details.localPosition);
 
     if (pressIndex != -1) {
@@ -344,7 +348,6 @@ class DragSelectGridViewState extends State<DragSelectGridView>
   }
 
   void _handleLongPressMoveUpdate(LongPressMoveUpdateDetails details) {
-    if (!widget.enable) return;
     if (!isDragging) return;
 
     _lastMoveUpdateDetails = details;
@@ -374,7 +377,6 @@ class DragSelectGridViewState extends State<DragSelectGridView>
   }
 
   void _handleLongPressEnd(LongPressEndDetails details) {
-    if (!widget.enable) return;
     widget.onDragEnd?.call(_selectionManager.selectedIndexes.toList());
     setState(_selectionManager.endDrag);
     stopScrolling();
