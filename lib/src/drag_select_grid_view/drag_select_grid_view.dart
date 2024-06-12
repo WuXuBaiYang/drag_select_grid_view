@@ -76,6 +76,7 @@ class DragSelectGridView extends StatefulWidget {
     double? autoScrollHotspotHeight,
     ScrollController? scrollController,
     this.onDragStart,
+    this.onDragUpdate,
     this.onDragEnd,
     this.gridController,
     this.triggerSelectionOnTap = false,
@@ -104,6 +105,9 @@ class DragSelectGridView extends StatefulWidget {
 
   /// 开始拖拽时回调
   final VoidCallback? onDragStart;
+
+  // 拖拽时回调
+  final ValueChanged<int>? onDragUpdate;
 
   // 结束拖拽时回调
   final ValueChanged<List<int>>? onDragEnd;
@@ -340,6 +344,7 @@ class DragSelectGridViewState extends State<DragSelectGridView>
     final dragIndex = _findIndexOfSelectable(details.localPosition);
 
     if ((dragIndex != -1) && (dragIndex != _selectionManager.dragEndIndex)) {
+      widget.onDragUpdate?.call(dragIndex);
       setState(() => _selectionManager.updateDrag(dragIndex));
       _notifySelectionChange();
     }
