@@ -75,6 +75,7 @@ class DragSelectGridView extends StatefulWidget {
     Key? key,
     double? autoScrollHotspotHeight,
     ScrollController? scrollController,
+    this.enable = true,
     this.onDragStart,
     this.onDragUpdate,
     this.onDragEnd,
@@ -102,6 +103,9 @@ class DragSelectGridView extends StatefulWidget {
             autoScrollHotspotHeight ?? defaultAutoScrollHotspotHeight,
         scrollController = scrollController ?? ScrollController(),
         super(key: key);
+
+  /// 是否启用拖拽选择
+  final bool enable;
 
   /// 开始拖拽时回调
   final ValueChanged<int>? onDragStart;
@@ -315,6 +319,7 @@ class DragSelectGridViewState extends State<DragSelectGridView>
   }
 
   void _handleTapUp(TapUpDetails details) {
+    if (!widget.enable) return;
     if (isSelecting || widget.triggerSelectionOnTap) {
       final tapIndex = _findIndexOfSelectable(details.localPosition);
 
@@ -327,6 +332,7 @@ class DragSelectGridViewState extends State<DragSelectGridView>
   }
 
   void _handleLongPressStart(LongPressStartDetails details) {
+    if (!widget.enable) return;
     final pressIndex = _findIndexOfSelectable(details.localPosition);
 
     if (pressIndex != -1) {
@@ -338,6 +344,7 @@ class DragSelectGridViewState extends State<DragSelectGridView>
   }
 
   void _handleLongPressMoveUpdate(LongPressMoveUpdateDetails details) {
+    if (!widget.enable) return;
     if (!isDragging) return;
 
     _lastMoveUpdateDetails = details;
@@ -367,6 +374,7 @@ class DragSelectGridViewState extends State<DragSelectGridView>
   }
 
   void _handleLongPressEnd(LongPressEndDetails details) {
+    if (!widget.enable) return;
     widget.onDragEnd?.call(_selectionManager.selectedIndexes.toList());
     setState(_selectionManager.endDrag);
     stopScrolling();
