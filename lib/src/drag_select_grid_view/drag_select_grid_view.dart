@@ -75,6 +75,8 @@ class DragSelectGridView extends StatefulWidget {
     Key? key,
     double? autoScrollHotspotHeight,
     ScrollController? scrollController,
+    this.onDragStart,
+    this.onDragEnd,
     this.gridController,
     this.triggerSelectionOnTap = false,
     this.reverse = false,
@@ -99,6 +101,12 @@ class DragSelectGridView extends StatefulWidget {
             autoScrollHotspotHeight ?? defaultAutoScrollHotspotHeight,
         scrollController = scrollController ?? ScrollController(),
         super(key: key);
+
+  /// 开始拖拽时回调
+  final VoidCallback? onDragStart;
+
+  // 结束拖拽时回调
+  final ValueChanged<List<int>>? onDragEnd;
 
   /// The height of the hotspot that enables auto-scroll.
   ///
@@ -315,6 +323,7 @@ class DragSelectGridViewState extends State<DragSelectGridView>
   }
 
   void _handleLongPressStart(LongPressStartDetails details) {
+    widget.onDragStart?.call();
     final pressIndex = _findIndexOfSelectable(details.localPosition);
 
     if (pressIndex != -1) {
@@ -353,6 +362,7 @@ class DragSelectGridViewState extends State<DragSelectGridView>
   }
 
   void _handleLongPressEnd(LongPressEndDetails details) {
+    widget.onDragEnd?.call(_selectionManager.selectedIndexes.toList());
     setState(_selectionManager.endDrag);
     stopScrolling();
   }
