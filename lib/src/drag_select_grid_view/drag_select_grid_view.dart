@@ -104,7 +104,7 @@ class DragSelectGridView extends StatefulWidget {
         super(key: key);
 
   /// 开始拖拽时回调
-  final VoidCallback? onDragStart;
+  final ValueChanged<int>? onDragStart;
 
   // 拖拽时回调
   final ValueChanged<int>? onDragUpdate;
@@ -327,10 +327,10 @@ class DragSelectGridViewState extends State<DragSelectGridView>
   }
 
   void _handleLongPressStart(LongPressStartDetails details) {
-    widget.onDragStart?.call();
     final pressIndex = _findIndexOfSelectable(details.localPosition);
 
     if (pressIndex != -1) {
+      widget.onDragStart?.call(pressIndex);
       setState(() => _selectionManager.startDrag(pressIndex));
       _notifySelectionChange();
       _updateLocalHistory();
