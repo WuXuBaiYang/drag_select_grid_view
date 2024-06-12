@@ -268,7 +268,7 @@ class DragSelectGridViewState extends State<DragSelectGridView>
       onLongPressEnd: _handleLongPressEnd,
       behavior: HitTestBehavior.translucent,
       child: IgnorePointer(
-        ignoring: isDragging,
+        ignoring: widget.enable && isDragging,
         child: GridView.builder(
           controller: widget.scrollController,
           reverse: widget.reverse,
